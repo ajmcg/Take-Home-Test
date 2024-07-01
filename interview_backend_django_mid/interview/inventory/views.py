@@ -10,6 +10,8 @@ from django.views.generic import ListView
 from django.utils.dateparse import parse_date
 from .models import Inventory
 
+
+
 class InventoryAfterDateView(ListView):
     """
     A view that displays a list of inventory items created after a specified date.
