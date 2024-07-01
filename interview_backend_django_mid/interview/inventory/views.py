@@ -6,6 +6,42 @@ from interview.inventory.models import Inventory, InventoryLanguage, InventoryTa
 from interview.inventory.schemas import InventoryMetaData
 from interview.inventory.serializers import InventoryLanguageSerializer, InventorySerializer, InventoryTagSerializer, InventoryTypeSerializer
 
+from django.views.generic import ListView
+from django.utils.dateparse import parse_date
+from .models import Inventory
+
+class InventoryAfterDateView(ListView):
+    """
+    A view that displays a list of inventory items created after a specified date.
+ 
+    Inherits from:
+    ListView: A generic class-based view for displaying a list of objects.
+
+    Attributes:
+    model (class): The model to use for the view (Inventory).
+    template_name (str): The name of the template to render the filtered inventories.
+    """
+    model = Inventory
+    # Template to render the filtered inventories
+    template_name = 'inventory_after_date.html'
+    
+    def get_queryset(self):
+        '''
+        Customize the queryset to filter inventory items created after a specified date.
+        Returns:             
+            QuerySet: A queryset of Inventory objects created after the specified date.             
+            If the date is invalid, returns an empty queryset.
+        '''
+        # Extract the 'date' parameter from the URL kwargs
+        date_str = self.kwargs['date']
+        # parse the date string into a date object
+        date = parse_date(date_str)
+        # check if date is valid
+        if date:
+            # if date is valid, filter inventory objects created after the given date
+            return Inventory.objects.filter(created_at__gte=date)
+        # Return empty queryset if date is invalid
+        return Inventory.objects.none()
 
 class InventoryListCreateView(APIView):
     queryset = Inventory.objects.all()
@@ -219,3 +255,4 @@ class InventoryTypeRetrieveUpdateDestroyView(APIView):
     
     def get_queryset(self, **kwargs):
         return self.queryset.get(**kwargs)
+    
